@@ -5,11 +5,6 @@ from ray.data import Dataset, from_items
 from PIL import Image
 import numpy as np
 
-from base import PipelineStep
-
-
-
-
 class Data:
     
     def __init__(self, input_path, output_path=None, train=True):
