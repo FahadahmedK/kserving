@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.nn.parallel.distributed import DistributedDataParallel
+import os
 
 
 class DenseLayer(nn.Module):
@@ -80,7 +82,14 @@ class DenseNet(nn.Module):
         x = F.adaptive_avg_pool2d(input=x, output_size=(1,1)).view(x.size(0), -1)
 
         return self.fc(x)
-        
+
+    def save(self, dp):
+        """Save model state dict to the specified directory path."""
+        save_path = os.path.join(dp, "model.pt")
+        if isinstance(self, DistributedDataParallel):
+            torch.save(self.module.state_dict(), save_path)
+        else:
+            torch.save(self.state_dict(), save_path)        
 
 
 # if __name__ == "__main__":

@@ -117,17 +117,13 @@ def train_func_per_worker(config: dict):
             ds=val_ds,
             batch_size=batch_size_per_worker,
             model=model,
-            loss_fn=loss_fn,
-            optimizer=optimizer
+            loss_fn=loss_fn
         )
 
         scheduler.step(val_loss)
 
         with tempfile.TemporaryDirectory() as dp:
-            if isinstance(model, DistributedDataParallel):  # cpu
-                model.module.save(dp=dp)
-            else:
-                model.save(dp=dp)
+            model.save(dp=dp)
 
             metrics = dict(epoch=epoch, lr=optimizer.param_groups[0]["lr"], train_loss=train_loss, val_loss=val_loss)
             checkpoint = Checkpoint.from_directory(dp)
@@ -140,11 +136,11 @@ def main():
     scaling_config = ScalingConfig(
         num_workers=1,
         use_gpu=True,
-        resources_per_worker={
-            "CPU": 8,           
-            "GPU": 1.0           
-        },
-        placement_strategy="PACK",
+        # resources_per_worker={
+        #     "CPU": 8,           
+        #     "GPU": 1.0           
+        # },
+        # placement_strategy="PACK",
     )
 
     checkpoint_config = CheckpointConfig(
@@ -175,7 +171,7 @@ def main():
     train_loop_config = {
         "num_classes": 10,
         "num_epochs": 30,
-        "batch_size": 2,
+        "batch_size": 16,
         "lr": 1.0e-2,
         "lr_factor": 0.1,
         "lr_patience": 0.3,
