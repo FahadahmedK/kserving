@@ -1,0 +1,22 @@
+Failure # 1 (occurred at 2024-12-01_17-44-07)
+[36mray::_Inner.train()[39m (pid=73957, ip=172.26.204.107, actor_id=5587e6e4cd2ee92eec8aa43b01000000, repr=TorchTrainer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/fahad/study/kserving/.venv/lib/python3.12/site-packages/ray/tune/trainable/trainable.py", line 331, in train
+    raise skipped from exception_cause(skipped)
+  File "/home/fahad/study/kserving/.venv/lib/python3.12/site-packages/ray/train/_internal/utils.py", line 57, in check_for_failure
+    ray.get(object_ref)
+           ^^^^^^^^^^^^^^^^^^^
+           ^^^^^^^^^^^^^^^^^^^^^
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ray.exceptions.RayTaskError(AttributeError): [36mray::_RayTrainWorker__execute.get_next()[39m (pid=74268, ip=172.26.204.107, actor_id=9d9b41570efe0bdecd38d50501000000, repr=<ray.train._internal.worker_group.RayTrainWorker object at 0x7f0ca353b6e0>)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/fahad/study/kserving/.venv/lib/python3.12/site-packages/ray/train/_internal/worker_group.py", line 33, in __execute
+    raise skipped from exception_cause(skipped)
+  File "/home/fahad/study/kserving/.venv/lib/python3.12/site-packages/ray/train/_internal/utils.py", line 176, in discard_return_wrapper
+    train_func(*args, **kwargs)
+  File "/home/fahad/study/kserving/model/train.py", line 97, in train_func_per_worker
+    model = ray.train.torch.prepare_mode(model)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'ray.train.torch' has no attribute 'prepare_mode'

@@ -43,8 +43,8 @@ class Data:
         tensor = transform(image)
 
         return {
-            "image": tensor.numpy(),
-            "label": label
+            "images": tensor.numpy(),
+            "labels": label
         }
     
     def create_dataset(self):

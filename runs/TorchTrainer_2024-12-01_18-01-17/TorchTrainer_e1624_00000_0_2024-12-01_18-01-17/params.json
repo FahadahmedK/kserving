@@ -1,0 +1,10 @@
+{
+  "train_loop_config": {
+    "batch_size": 2,
+    "lr": 0.01,
+    "lr_factor": 0.1,
+    "lr_patience": 0.3,
+    "num_classes": 10,
+    "num_epochs": 30
+  }
+}

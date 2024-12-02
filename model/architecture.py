@@ -51,13 +51,13 @@ class TransitionLayer(nn.Module):
 
 class DenseNet(nn.Module):
 
-    def __init__(self, num_classes, growth_rate=12, num_blocks=3, num_layers_per_block=4):
+    def __init__(self, in_channels, num_classes, growth_rate=2, num_blocks=1, num_layers_per_block=2):
         
         super(DenseNet, self).__init__()
         self.growth_rate = growth_rate
 
 
-        self.conv1 = nn.Conv2d(in_channels=3, out_channels=growth_rate*2, kernel_size=3, stride=1, padding=1, bias=False)
+        self.conv1 = nn.Conv2d(in_channels=in_channels, out_channels=growth_rate*2, kernel_size=3, stride=1, padding=1, bias=False)
         in_channels = growth_rate * 2
         self.blocks = nn.ModuleList()
         for i in range(num_blocks):
@@ -87,5 +87,5 @@ class DenseNet(nn.Module):
 
 #     x = torch.randn(size=(3,3, 128, 128))
 #     denselayer = DenseLayer(in_channels=3, growth_rate=6)
-#     # denselayer(x)
+#     densenet = DenseNet(in_channels=3, num_classes=10)
 #     import pdb; pdb.set_trace()
