@@ -3,21 +3,8 @@ name = "kserving"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-
 requires-python = ">=3.12"
-dependencies = [
-    "jupyter>=1.1.1",
-    "mlflow>=2.18.0",
-    "pytest>=8.3.3",
-    "ray[data,serve,train,tune]>=2.39.0",
-    "torch>=2.5.1",
-    "torchvision>=0.20.1",
-    "tqdm>=4.67.1",
-]
+dependencies = []
 
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
-
-[tool.setuptools]
-package-dir = {"" = "model"}
+[tool.uv.workspace]
+members = ["frontend", "gateway", "model"]
