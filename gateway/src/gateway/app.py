@@ -20,8 +20,6 @@ async def process_image(image_bytes):
     return tensor.unsqueeze(0).numpy()
 
 
-
-
 @app.post('/predict')
 async def predict(file: UploadFile = File()):
     
