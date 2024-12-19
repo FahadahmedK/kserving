@@ -9,14 +9,13 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.115.6",
-    "model",
-    "torch>=2.5.1",
-    "torchvision>=0.20.1",
+    "numpy>=2.2.0",
+    "pillow>=11.0.0",
+    "python-multipart>=0.0.20",
+    "requests>=2.32.3",
+    "uvicorn>=0.34.0",
 ]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
-
-[tool.uv.sources]
-model = { workspace = true }
