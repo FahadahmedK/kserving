@@ -4,7 +4,11 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "numpy>=2.2.0",
+    "nvgpu>=0.10.0",
+    "pyyaml>=6.0.2",
+]
 
 [dependency-groups]
 torchserve = [

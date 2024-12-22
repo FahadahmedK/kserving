@@ -14,6 +14,19 @@ from PIL import Image
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+idx_to_class = {
+    0: "dress", 
+    1: "hat", 
+    2: "longsleeve",
+    3: "outwear",
+    4: "pants",
+    5: "shirt",
+    6: "shoes",
+    7: "shorts",
+    8: "skirt",
+    9: "t-shirt"
+}
+
 MODEL_SERVICE = os.getenv('MODEL_SERVICE')
 if not MODEL_SERVICE:
     raise ValueError("MODEL_SERVICE environment variable is not set")
@@ -102,25 +115,32 @@ async def predict(file: UploadFile = File(...)) -> JSONResponse:
     try:
         image_bytes = await file.read()
         processed_image = await process_image(image_bytes)
-        
-        headers = {'Content-Type': 'In/json'}
+        logger.info(f"Processed image shape: {processed_image.shape}")
+        headers = {'Content-Type': 'application/json'}
         # model_endpoint = MODEL_SERVICE
         
+        image_content = processed_image.tolist()
+        logging.info(f"Image content shape: {len(image_content)}")
+
         response = requests.post(
             url=MODEL_SERVICE,
-            json={'data': processed_image.tolist()},
+            json={'image': processed_image.tolist()},
             headers=headers,
             timeout=30  # Add timeout
         )
-        
+
         if response.status_code != 200:
             logger.error(f"Model service error: {response.status_code}")
-            # raise HTTPException(
-            #     status_code=status.HTTP_502_BAD_GATEWAY,
-            #     detail="Error from model service"
-            # )
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail="Error from model service"
+            ) from e
+
+        else:
+            response = response.json()
+            response['prediction'] = idx_to_class[response['prediction']]
             
-        return JSONResponse(content=response.json())
+        return JSONResponse(content=response)
         
     except requests.exceptions.RequestException as e:
         logger.error(f"Request to model service failed: {str(e)}")

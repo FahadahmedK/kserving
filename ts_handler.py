@@ -51,12 +51,8 @@ class TorchServeHandler(BaseHandler):
         logger.debug(f"Preprocessing batch of size: {len(data)}")
         try:
             images = []
-            for i, row in enumerate(data):
-                # Log first few items for debugging
-                if i < 3:
-                    logger.debug(f"Sample {i} shape: {len(row.get('data', []) or row.get('body', []))}")
-                
-                image = torch.tensor(row.get("data") or row.get("body")).float()
+            for i, row in enumerate(data):                
+                image = torch.tensor(row.get('body').get('image')).float()
                 images.append(image)
             
             batch = torch.cat(images, 0).to(self.device)
@@ -64,6 +60,7 @@ class TorchServeHandler(BaseHandler):
             return batch
             
         except Exception as e:
+            logger.error(f"Data content: {data}")
             logger.error(f"Error during preprocessing: {str(e)}", exc_info=True)
             raise
     
