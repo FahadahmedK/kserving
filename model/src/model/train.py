@@ -21,7 +21,7 @@ from ray.train import (
 )
 from ray.air.integrations.mlflow import MLflowLoggerCallback
 
-from data import Data
+from model.data import Data
 from model.architecture import DenseNet
 
 
