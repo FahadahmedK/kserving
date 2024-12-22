@@ -96,4 +96,6 @@ class DenseNet(nn.Module):
 #     x = torch.randn(size=(3,3, 128, 128))
 #     denselayer = DenseLayer(in_channels=3, growth_rate=6)
 #     densenet = DenseNet(in_channels=3, num_classes=10)
+#     state_dict = torch.load("/home/fahad/study/kserving/rayruns/TorchTrainer_2024-12-07_13-58-08/TorchTrainer_4a35b_00000_0_2024-12-07_13-58-09/checkpoint_000099/model.pt")
+#     densenet.load_state_dict(state_dict)
 #     import pdb; pdb.set_trace()

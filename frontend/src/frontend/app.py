@@ -20,7 +20,7 @@ def process_prediction(response: requests.Response) -> Optional[str]:
     try:
         if response.status_code == 200:
             result = response.json()
-            return f"Prediction: {result['prediction']}"
+            return f"Prediction: {result}" #['prediction']}"
         else:
             logger.error(f"Prediction failed with status code: {response.status_code}")
             return None

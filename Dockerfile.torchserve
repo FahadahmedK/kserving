@@ -1,0 +1,50 @@
+FROM pytorch/torchserve:latest
+
+ARG PROJECT_DIR
+
+# Use the NVIDIA container runtime
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+# Create directories and set permissions before switching user
+RUN mkdir -p /home/model-server/model-store && \
+    chown model-server:model-server /home/model-server
+
+# Copy files with correct ownership
+COPY --chown=model-server:model-server ${PROJECT_DIR}/uv.lock /home/model-server/uv.lock
+COPY --chown=model-server:model-server ${PROJECT_DIR}/model /home/model-server/model
+COPY --chown=model-server:model-server ${PROJECT_DIR}/pyproject.toml /home/model-server/pyproject.toml
+COPY --chown=model-server:model-server ${PROJECT_DIR}/ts_handler.py /home/model-server/ts_handler.py
+COPY --chown=model-server:model-server rayruns/TorchTrainer_2024-12-07_13-58-08/TorchTrainer_4a35b_00000_0_2024-12-07_13-58-09/checkpoint_000099/model.pt /home/model-server/model.pt
+
+# Set environment variables
+ENV UV_HTTP_TIMEOUT=300
+ENV UV_LINK_MODE=copy
+
+# Switch to model-server user
+USER model-server
+WORKDIR /home/model-server
+
+# Install dependencies
+RUN uv sync --only-group torchserve
+RUN uv pip install --no-deps -e ./model
+
+RUN uv add pyyaml numpy nvgpu
+
+# RUN sudo apt install nvidia-utils
+
+ENV TS_SECURITY=false
+# Create model archive
+RUN torch-model-archiver \
+    --model-name densenet \
+    --version 1.0 \
+    --serialized-file model.pt \
+    --handler ts_handler.py \
+    --export-path /home/model-server/model-store
+
+EXPOSE 8080 8081
+
+
+CMD ["uv", "run", "torchserve", "--start", "--model-store", "model-store", "--models", "densenet=densenet.mar"]

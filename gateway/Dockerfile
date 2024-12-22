@@ -17,7 +17,6 @@ COPY ${PROJECT_DIR}/gateway /app/gateway
 ENV UV_HTTP_TIMEOUT=300
 ENV UV_LINK_MODE=copy
 
-
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --package="gateway" --frozen --no-install-project
 
 RUN uv sync --package="gateway" --frozen

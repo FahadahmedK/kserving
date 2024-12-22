@@ -30,13 +30,23 @@ services:
       - "5000:5000"
     networks:
       - local-network
+    depends_on:
+      - model
 
   model:
     build:
-      context: ../.. #/model
-      dockerfile: model/DockerfileTS
+      context: ../.. 
+      dockerfile: Dockerfile.torchserve
       args:
         <<: *x-common-args
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
     ports:
       - "8080:8080"
       - "8081:8081"

@@ -103,11 +103,11 @@ async def predict(file: UploadFile = File(...)) -> JSONResponse:
         image_bytes = await file.read()
         processed_image = await process_image(image_bytes)
         
-        headers = {'Content-Type': 'application/json'}
-        model_endpoint = f'{MODEL_SERVICE}/predictions/densenet'
+        headers = {'Content-Type': 'In/json'}
+        # model_endpoint = MODEL_SERVICE
         
         response = requests.post(
-            url=model_endpoint,
+            url=MODEL_SERVICE,
             json={'data': processed_image.tolist()},
             headers=headers,
             timeout=30  # Add timeout
@@ -115,10 +115,10 @@ async def predict(file: UploadFile = File(...)) -> JSONResponse:
         
         if response.status_code != 200:
             logger.error(f"Model service error: {response.status_code}")
-            raise HTTPException(
-                status_code=status.HTTP_502_BAD_GATEWAY,
-                detail="Error from model service"
-            )
+            # raise HTTPException(
+            #     status_code=status.HTTP_502_BAD_GATEWAY,
+            #     detail="Error from model service"
+            # )
             
         return JSONResponse(content=response.json())
         
