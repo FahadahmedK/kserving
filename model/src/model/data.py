@@ -41,7 +41,7 @@ class Data:
         image_path = image_data["image_path"]
         label = image_data["label"]
 
-        transform = Data.get_transforms()
+        transform = self.get_transforms()
 
         image = Image.open(image_path).convert('RGB')
 
@@ -69,6 +69,8 @@ class Data:
                 })
 
         ds = from_items(image_data)
+        if self.train:
+            ds = ds.random_shuffle()
         ds = ds.map(self._preprocess)
 
 

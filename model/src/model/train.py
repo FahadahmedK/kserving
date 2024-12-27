@@ -26,7 +26,7 @@ from model.architecture import DenseNet
 
 
 # Config MLflow
-EFS_DIR = Path(f"{Path(__file__).parent.parent.absolute()}/runs")
+EFS_DIR = Path(f"{Path(__file__).parent.parent.absolute()}/rayruns")
 
 Path(EFS_DIR).mkdir(parents=True, exist_ok=True)
 
@@ -46,11 +46,12 @@ def one_train_step(
     
     model.train()
     loss = 0.0
-    ds_generator = ds.iter_torch_batches(batch_size=batch_size)
-
+    ds_generator = ds.iter_torch_batches(batch_size=batch_size, local_shuffle_buffer_size=50)
     for i, batch in enumerate(ds_generator):
         optimizer.zero_grad()
         imgs, labels = batch["images"], batch["labels"]
+        if i == 0:
+            print(labels)
         logits = model(imgs) # (b, 10)
         batch_loss = loss_fn(logits, labels)
         batch_loss.backward()
@@ -98,7 +99,7 @@ def train_func_per_worker(config: dict):
 
     loss_fn = nn.CrossEntropyLoss()
     optimizer = torch.optim.AdamW(params=model.parameters(), lr=lr)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=lr_factor, patience=lr_patience)
+    # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=lr_factor, patience=lr_patience)
     num_workers = ray.train.get_context().get_world_size()
     batch_size_per_worker = batch_size // num_workers
 
@@ -119,7 +120,7 @@ def train_func_per_worker(config: dict):
             loss_fn=loss_fn
         )
 
-        scheduler.step(val_loss)
+        # scheduler.step(val_loss)
 
         with tempfile.TemporaryDirectory() as dp:
             model.save(dp=dp)
@@ -136,7 +137,7 @@ def main():
         num_workers=1,
         use_gpu=True,
         # resources_per_worker={
-        #     "CPU": 8,           
+        #     "CPU": 4,           
         #     "GPU": 1.0           
         # },
         # placement_strategy="PACK",
@@ -163,15 +164,14 @@ def main():
 
     train_data = Data("/home/fahad/study/kserving/data/train")
     train_ds, class_to_idx = train_data.create_dataset()
-    
     val_data = Data("/home/fahad/study/kserving/data/validation", train=False)
     val_ds, _ = val_data.create_dataset()    
 
     train_loop_config = {
         "num_classes": 10,
-        "num_epochs": 30,
-        "batch_size": 16,
-        "lr": 1.0e-2,
+        "num_epochs": 100,
+        "batch_size": 8,
+        "lr": 1.0e-4,
         "lr_factor": 0.1,
         "lr_patience": 0.3,
         "num_classes": len(class_to_idx)
