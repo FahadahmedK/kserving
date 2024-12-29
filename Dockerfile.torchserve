@@ -27,7 +27,7 @@ RUN --mount=type=cache,target=/root/.cache/uv uv sync --only-group torchserve
 
 COPY --chown=model-server:model-server ${PROJECT_DIR}/ts_handler.py /home/model-server/ts_handler.py
 COPY --chown=model-server:model-server ${PROJECT_DIR}/model /home/model-server/model
-COPY --chown=model-server:model-server rayruns/TorchTrainer_2024-12-07_13-58-08/TorchTrainer_4a35b_00000_0_2024-12-07_13-58-09/checkpoint_000099/model.pt /home/model-server/model.pt
+COPY --chown=model-server:model-server rayruns/TorchTrainer_2024-12-28_22-24-05/TorchTrainer_72c40_00000_0_2024-12-28_22-24-05/checkpoint_000082/model.pt /home/model-server/model.pt
 
 # Install dependencies
 RUN --mount=type=cache,target=/root/.cache/uv uv pip install --no-deps -e ./model
