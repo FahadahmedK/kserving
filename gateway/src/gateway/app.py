@@ -73,7 +73,7 @@ async def process_image(image_bytes: bytes) -> np.ndarray:
         image = image.astype(np.float32) / 255.0
 
         # normalize dimensionwise 
-        mean, std = np.array([0.485, 0.456, 0.406]), np.array([0.229, 0.224, 0.225])
+        mean, std = np.array([0., 0., 0.]), np.array([1.0, 1.0, 1.0])
         image = (image - mean) / std
 
         image = np.transpose(image, (2, 0, 1))
