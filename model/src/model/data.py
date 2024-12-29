@@ -69,10 +69,7 @@ class Data:
                 })
 
         ds = from_items(image_data)
-        if self.train:
-            ds = ds.random_shuffle()
         ds = ds.map(self._preprocess)
-
 
         return ds, class_to_idx
     
