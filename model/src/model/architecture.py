@@ -52,7 +52,7 @@ class TransitionLayer(nn.Module):
 
 class DenseNet(nn.Module):
 
-    def __init__(self, in_channels, num_classes, growth_rate=6, num_blocks=3, num_layers_per_block=4):
+    def __init__(self, in_channels, num_classes, growth_rate=12, num_blocks=3, num_layers_per_block=6):
         
         super(DenseNet, self).__init__()
         self.growth_rate = growth_rate
@@ -61,7 +61,7 @@ class DenseNet(nn.Module):
         self.conv1 = nn.Sequential(
             nn.Conv2d(in_channels, growth_rate*2, kernel_size=7, stride=2, padding=3),
             nn.BatchNorm2d(growth_rate*2),
-            nn.ReLU(inplace=True),
+            nn.LeakyReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         )
         in_channels = growth_rate * 2

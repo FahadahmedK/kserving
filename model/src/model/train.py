@@ -175,7 +175,7 @@ def main():
     train_loop_config = {
         "num_epochs": 200,
         "batch_size": 32,
-        "lr": 1.0e-3,
+        "lr": 1.0e-4,
         "lr_factor": 0.1,
         "lr_patience": 0.3,
         "num_classes": len(class_to_idx)
