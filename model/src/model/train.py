@@ -122,15 +122,23 @@ def train_func_per_worker(config: dict):
 
         accuracy = (y_trues == y_preds).sum() / len(y_preds)
 
-        weight = 0.5
-        weighted_checkpoint_metric = - weight * 2 * accuracy + (1-weight) * val_loss 
+        labels = np.unique(y_trues)
 
+        label_wise_accuracies = {}
+        for label in labels:
+            label_indices = np.where(y_trues==label)
+            result = y_preds[label_indices[0]] == label
+            label_wise_accuracies[label] = result.sum() / len(result)
+
+        all_accuracies = np.array(list(label_wise_accuracies.values()))
+
+        harmonic_mean_label_wise_accuracies = len(all_accuracies) / (( 1 / all_accuracies)).sum()
         # scheduler.step(val_loss)
 
         with tempfile.TemporaryDirectory() as dp:
             model.save(dp=dp)
 
-            metrics = dict(epoch=epoch, accuracy=accuracy, train_loss=train_loss, val_loss=val_loss, weighted_checkpoint_metric=weighted_checkpoint_metric)
+            metrics = dict(epoch=epoch, accuracy=accuracy, train_loss=train_loss, val_loss=val_loss, harmonic_mean_label_wise_accuracies=harmonic_mean_label_wise_accuracies)
             checkpoint = Checkpoint.from_directory(dp)
             ray.train.report(metrics, checkpoint=checkpoint)
 
@@ -150,8 +158,8 @@ def main():
 
     checkpoint_config = CheckpointConfig(
         num_to_keep=5,
-        checkpoint_score_attribute="val_loss",
-        checkpoint_score_order="min"
+        checkpoint_score_attribute="harmonic_mean_label_wise_accuracies",
+        checkpoint_score_order="max"
     )
 
     mlflow_callback = MLflowLoggerCallback(
@@ -173,7 +181,7 @@ def main():
     val_ds, _ = val_data.create_dataset()    
 
     train_loop_config = {
-        "num_epochs": 200,
+        "num_epochs": 300,
         "batch_size": 32,
         "lr": 1.0e-4,
         "lr_factor": 0.1,
@@ -197,6 +205,8 @@ def main():
     results = trainer.fit()
 
     best_checkpoint = results.checkpoint
+
+    print(best_checkpoint)
 
 if __name__ == "__main__":
 
