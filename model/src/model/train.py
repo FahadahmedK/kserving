@@ -98,7 +98,7 @@ def train_func_per_worker(config: dict):
     model = ray.train.torch.prepare_model(model)
 
     loss_fn = nn.CrossEntropyLoss(weight=torch.tensor([0.0908268 , 0.17796146, 0.04810826, 0.11896337, 0.04677192,
-       0.07548021, 0.11055182, 0.10836267, 0.19543982, 0.02753366]))
+       0.07548021, 0.11055182, 0.10836267, 0.19543982, 0.02753366], device=ray.train.torch.get_device()))
     optimizer = torch.optim.Adam(params=model.parameters(), lr=lr)
     # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=lr_factor, patience=lr_patience)
     num_workers = ray.train.get_context().get_world_size()
