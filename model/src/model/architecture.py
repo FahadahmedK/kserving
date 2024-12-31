@@ -52,7 +52,7 @@ class TransitionLayer(nn.Module):
 
 class DenseNet(nn.Module):
 
-    def __init__(self, in_channels, num_classes, growth_rate=12, num_blocks=3, num_layers_per_block=6):
+    def __init__(self, in_channels, num_classes, growth_rate=12, num_blocks=4, num_layers_per_block=6):
         
         super(DenseNet, self).__init__()
         self.growth_rate = growth_rate
