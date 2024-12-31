@@ -52,13 +52,18 @@ class TransitionLayer(nn.Module):
 
 class DenseNet(nn.Module):
 
-    def __init__(self, in_channels, num_classes, growth_rate=2, num_blocks=3, num_layers_per_block=2):
+    def __init__(self, in_channels, num_classes, growth_rate=6, num_blocks=3, num_layers_per_block=4):
         
         super(DenseNet, self).__init__()
         self.growth_rate = growth_rate
 
 
-        self.conv1 = nn.Conv2d(in_channels=in_channels, out_channels=growth_rate*2, kernel_size=3, stride=1, padding=1, bias=False)
+        self.conv1 = nn.Sequential(
+            nn.Conv2d(in_channels, growth_rate*2, kernel_size=7, stride=2, padding=3),
+            nn.BatchNorm2d(growth_rate*2),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        )
         in_channels = growth_rate * 2
         self.blocks = nn.ModuleList()
         for i in range(num_blocks):

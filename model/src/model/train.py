@@ -46,7 +46,7 @@ def one_train_step(
     
     model.train()
     loss = 0.0
-    ds_generator = ds.iter_torch_batches(batch_size=batch_size, local_shuffle_buffer_size=50)
+    ds_generator = ds.iter_torch_batches(batch_size=batch_size, local_shuffle_buffer_size=1000)
     for i, batch in enumerate(ds_generator):
         optimizer.zero_grad()
         imgs, labels = batch["images"], batch["labels"]
@@ -69,7 +69,7 @@ def one_eval_step(
     model.eval()
     loss = 0.0
     y_trues, y_preds = [], []
-    ds_generator = ds.iter_torch_batches(batch_size=batch_size)
+    ds_generator = ds.iter_torch_batches(batch_size=batch_size, local_shuffle_buffer_size=500)
     with torch.inference_mode():
         for i, batch in enumerate(ds_generator):
             imgs, labels = batch["images"], batch["labels"]
@@ -173,10 +173,9 @@ def main():
     val_ds, _ = val_data.create_dataset()    
 
     train_loop_config = {
-        "num_classes": 10,
         "num_epochs": 200,
         "batch_size": 32,
-        "lr": 1.0e-2,
+        "lr": 1.0e-3,
         "lr_factor": 0.1,
         "lr_patience": 0.3,
         "num_classes": len(class_to_idx)
