@@ -74,7 +74,9 @@ class Data:
         image_data = []
         class_to_idx = {}
 
-        for idx, class_name in enumerate(os.listdir(self.input_path)):
+        class_names = ['dress', 'hat', 'longsleeve', 'outwear', 'pants', 'shirt', 'shoes', 'shorts', 'skirt', 't-shirt']
+
+        for idx, class_name in enumerate(class_names): #os.listdir(self.input_path)):
 
             class_path = os.path.join(self.input_path, class_name)
             class_to_idx[class_name] = idx 

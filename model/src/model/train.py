@@ -97,7 +97,8 @@ def train_func_per_worker(config: dict):
     model = DenseNet(in_channels=3, num_classes=num_classes)
     model = ray.train.torch.prepare_model(model)
 
-    loss_fn = nn.CrossEntropyLoss()
+    loss_fn = nn.CrossEntropyLoss(weight=[0.0908268 , 0.17796146, 0.04810826, 0.11896337, 0.04677192,
+       0.07548021, 0.11055182, 0.10836267, 0.19543982, 0.02753366])
     optimizer = torch.optim.Adam(params=model.parameters(), lr=lr)
     # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=lr_factor, patience=lr_patience)
     num_workers = ray.train.get_context().get_world_size()
@@ -131,14 +132,17 @@ def train_func_per_worker(config: dict):
             label_wise_accuracies[label] = result.sum() / len(result)
 
         all_accuracies = np.array(list(label_wise_accuracies.values()))
-
+        print(f"all_accuracies: {all_accuracies}")
         harmonic_mean_label_wise_accuracies = len(all_accuracies) / (( 1 / all_accuracies)).sum()
+        print(f"harmonic_mean: {harmonic_mean_label_wise_accuracies}")
+        
+        mean_all_accuracies = all_accuracies.sum() / len(all_accuracies)
         # scheduler.step(val_loss)
 
         with tempfile.TemporaryDirectory() as dp:
             model.save(dp=dp)
 
-            metrics = dict(epoch=epoch, accuracy=accuracy, train_loss=train_loss, val_loss=val_loss, harmonic_mean_label_wise_accuracies=harmonic_mean_label_wise_accuracies)
+            metrics = dict(epoch=epoch, mean_all_accuracies=mean_all_accuracies, accuracy=accuracy, train_loss=train_loss, val_loss=val_loss, harmonic_mean_label_wise_accuracies=harmonic_mean_label_wise_accuracies)
             checkpoint = Checkpoint.from_directory(dp)
             ray.train.report(metrics, checkpoint=checkpoint)
 
@@ -157,8 +161,8 @@ def main():
     )
 
     checkpoint_config = CheckpointConfig(
-        num_to_keep=5,
-        checkpoint_score_attribute="harmonic_mean_label_wise_accuracies",
+        num_to_keep=10,
+        checkpoint_score_attribute="mean_all_accuracies",
         checkpoint_score_order="max"
     )
 
@@ -175,14 +179,14 @@ def main():
         )
     
 
-    train_data = Data("/home/fahad/study/kserving/data/train")
+    train_data = Data("/content/kserving/data/train")
     train_ds, class_to_idx = train_data.create_dataset()
-    val_data = Data("/home/fahad/study/kserving/data/validation", train=False)
+    val_data = Data("/content/kserving/data/validation", train=False)
     val_ds, _ = val_data.create_dataset()    
 
     train_loop_config = {
         "num_epochs": 300,
-        "batch_size": 32,
+        "batch_size": 64,
         "lr": 1.0e-4,
         "lr_factor": 0.1,
         "lr_patience": 0.3,
