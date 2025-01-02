@@ -162,7 +162,7 @@ def main():
 
     checkpoint_config = CheckpointConfig(
         num_to_keep=10,
-        checkpoint_score_attribute="mean_all_accuracies",
+        checkpoint_score_attribute="harmonic_mean_label_wise_accuracies",
         checkpoint_score_order="max"
     )
 
